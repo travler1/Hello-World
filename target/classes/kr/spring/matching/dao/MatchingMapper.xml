@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.matching.dao.MatchingMapper">
+	<!-- 현직자 신청 -->
+	<insert id="insertEmp" parameterType="EmpVO">
+		INSERT INTO emp(
+		emp_num,
+		emp_status,
+		comsize,
+		compeople,
+		field,
+		role,
+		career,
+		salary_status,
+		salary,
+		periodtime,
+		education,
+		major,
+		certification,
+		location,
+		location_api,
+		location_api_lat,
+		location_api_lng,
+		workstart,
+		mem_num,
+		filename,
+		advice,
+		register_date
+		)
+		VALUES(
+		emp_seq.nextval,
+		0,
+		#{comsize},
+		#{compeople},
+		#{field},
+		#{role},
+		#{career},
+		#{salary_status},
+		#{salary},
+		#{periodtime},
+		#{education},
+		#{major},
+		#{certification},
+		#{location},
+		#{location_api},
+		#{location_api_lat},
+		#{location_api_lng},
+		#{workstart},
+		#{mem_num},
+		#{filename},
+		#{advice},
+		SYSDATE
+		)
+	</insert>
+
+	<select id="selectEmp" parameterType="integer"
+		resultType="empVO">
+		SELECT
+			a.*,
+			hwmember.email,
+			hwmember_detail.name
+		FROM
+			(SELECT * FROM emp) a
+		JOIN
+			hwmember
+		ON
+			a.mem_num = hwmember.mem_num
+		JOIN
+			hwmember_detail
+		ON
+			a.mem_num = hwmember_detail.mem_num
+		WHERE
+			a.mem_num = #{mem_num}
+	</select>
+
+	<select id="listEmp" parameterType="map" resultType="empVO">
+		SELECT
+		*
+		FROM (SELECT
+		a.*, rownum rnum
+		FROM (SELECT
+		emp_num,
+		emp_status,
+		comsize,
+		compeople,
+		field,
+		role,
+		career,
+		salary_status,
+		salary,
+		periodtime,
+		education,
+		major,
+		certification,
+		location,
+		location_api,
+		location_api_lat,
+		location_api_lng,
+		workstart,
+		mem_num,
+		filename,
+					<![CDATA[
+					REPLACE(REPLACE(advice,'<','&lt;'),'>', '&gt;')advice,
+					]]>
+		register_date,
+		m_date,
+		auth
+		FROM
+		emp
+		LEFT OUTER JOIN hwmember USING(mem_num)
+		WHERE auth=2
+		ORDER BY register_date DESC)a)
+				<![CDATA[
+				WHERE rnum >= #{start} AND rnum <= #{end}
+				]]>
+
+	</select>
+
+	<select id="insertAdvice" parameterType="adviceVO">
+		INSERT INTO
+		advice
+		(advice_num,
+		sender,
+		receiver,
+		advice_content,
+		date_sent,
+		advice_ip,
+		filename)
+		VALUES
+		(
+		advice_seq.nextval,
+		#{sender},
+		#{receiver},
+		#{advice_content},
+		SYSDATE,
+		#{advice_ip},
+		#{filename}
+		)
+	</select>
+
+	<!-- 첨삭 응답완료처리 -->
+	<update id="completeAdvice" parameterType="integer">
+		UPDATE 
+			advice
+		SET 
+			advice_complete = 1
+		WHERE
+			sender=#{sender}
+		AND
+			receiver=#{receiver}
+	</update>
+	
+	<!-- 받은 첨삭 검색 -->
+	<sql id="adviceSearch">
+		<where>
+			<if test="keyword!=null and keyword!=''">
+				<if test="keyfield==1">
+					AND sender LIKE '%' || #{keyword} || '%'
+				</if>
+				<if test="keyfield==2">
+					AND advice_content LIKE '%' || #{keyword} || '%'
+				</if>
+				<if test="keyfield==3">
+					AND (advice_content LIKE '%' || #{keyword} || '%' OR
+					sender LIKE '%' || #{keyword} || '%')
+				</if>
+			</if>
+		</where>
+	</sql>
+
+	<!-- 받은 첨삭 리스트 -->
+	<select id="selectReceivedAdvice" parameterType="map"
+		resultType="adviceVO">
+		SELECT
+		*
+		FROM
+		(SELECT
+		a.*, rownum rnum
+		FROM
+		(SELECT
+		advice_num,
+		sender,
+		receiver,
+			   		<![CDATA[
+				   	 REPLACE(REPLACE(advice_content,'<','&lt;'),'>', '&gt;')advice_content,
+			   		]]>
+		date_sent,
+		date_read,
+		advice_complete,
+		member.name AS name
+		FROM
+		advice
+		JOIN
+		hwmember_detail member
+		ON advice.sender=member.mem_num
+		WHERE
+		receiver=#{receiver}
+		<include refid="adviceSearch"></include>
+		ORDER BY advice_num DESC,
+		date_read NULLS FIRST,
+		date_read DESC)a)
+		<![CDATA[
+		WHERE rnum>= #{start} AND rnum<= #{end}
+		]]>
+	</select>
+
+	<!-- 보낸 첨삭 검색 -->
+	<sql id="adviceSendSearch">
+		<where>
+			<if test="keyword!=null and keyword!=''">
+				<if test="keyfield==1"> AND receiver LIKE '%' || #{keyword} || '%' </if>
+				<if test="keyfield==2"> AND advice_content LIKE '%' || #{keyword} || '%' </if>
+				<if test="keyfield==3"> AND (advice_content LIKE '%' || #{keyword} || '%' OR
+					receiver LIKE '%' || #{keyword} || '%') </if>
+			</if>
+		</where>
+	</sql>
+	<!-- 보낸 첨삭 리스트 -->
+	<select id="selectSentAdvice" parameterType="map"
+		resultType="adviceVO">
+		SELECT
+		*
+		FROM
+		(SELECT a.*, rownum rnum
+		FROM
+		(SELECT
+		advice_num,
+		sender,
+		receiver,
+					<![CDATA[ REPLACE(REPLACE(advice_content,'<','&lt;'),'>', '&gt;')advice_content, ]]>
+		date_sent,
+		date_read,
+		advice_complete,
+		member.name AS name
+		FROM
+		advice
+		JOIN
+		hwmember_detail member
+		ON advice.receiver=member.mem_num
+		WHERE
+		sender=#{sender}
+		<include refid="adviceSendSearch" />
+		ORDER BY advice_num DESC, date_read NULLS FIRST, date_read DESC)a)
+				<![CDATA[ WHERE rnum>= #{start} AND rnum<= #{end} ]]>
+	</select>
+
+
+
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.hwchat.dao.HwChatMapper">
+	<select id="selectChatRoom" parameterType="map" resultType="Integer">
+		SELECT
+			chatroom_num
+		FROM
+			hw_chatroom
+		WHERE 
+			(sender=#{sender} AND receiver=#{receiver})
+			OR
+			(sender=#{receiver} AND receiver=#{receiver})
+	</select>
+	
+	<select id="selectChatRoomCheck" parameterType="map" resultType="Integer">
+		SELECT
+			COUNT(*)
+		FROM 
+			hw_chatroom
+		WHERE
+			(sender=#{sender} AND receiver=#{receiver})
+			OR
+			(sender=#{receiver} AND receiver=#{sender})
+				
+	</select>
+	
+	<insert id="insertChatRoom" parameterType="map">
+		INSERT INTO
+			hw_chatroom
+			(
+			chatroom_num,
+			sender,
+			receiver)
+		VALUES
+			(
+			hw_chatroom_seq.nextval,
+			#{sender},
+			#{receiver}
+			)
+	</insert>
+
+	
+	<!-- 채팅 추가 -->
+	<insert id="insertChat" parameterType="ChatVO">
+		INSERT INTO
+			hw_chat
+			(
+				chat_num,
+				chatRoom_num,
+				mem_num,
+				chat_message,
+				chat_regdate
+			)
+		VALUES
+			(
+				hw_chat_seq.nextval,
+				#{chatRoom_num},
+				#{mem_num},
+				#{chat_message},
+				SYSDATE
+			)
+	</insert>
+	
+	<!-- 채팅 읽음처리 -->
+	<update id="updateChatRead" parameterType="map">
+		UPDATE hw_chat
+			SET
+				chat_readcheck=0
+		WHERE 
+			chatroom_num=#{chatroom_num}
+				AND
+			sender!=#{sender}
+	</update>
+	
+	<select id="selectChatDetail" parameterType="integer" resultType="chatVO">
+		SELECT
+			a.*, name
+		FROM
+			(SELECT
+				*
+			 FROM
+			 	hw_chat)a
+		JOIN
+			hwmember_detail
+		ON
+			a.mem_num=hwmember_detail.mem_num
+		WHERE 
+			chatroom_num=#{chatRoom_num}
+		ORDER BY
+			chat_regdate	 
+	</select>
+</mapper>
+	
+	
+
+
+
+
+
+
