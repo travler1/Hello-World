@@ -12,7 +12,7 @@
 		<div id="textareaBox" class="hide">
 			<textarea rows="20" cols="40" name="chat_message" id="chat_message"></textarea>
 				 <div id="message_btn">
-					<input type="submit" value="전송">
+					<input type="submit" value="전송" >
 				</div>    
 		</div>
 	</form>

@@ -281,7 +281,7 @@ public class MypageAdviceController {
         FileInputStream fis = new FileInputStream(f);
         FileCopyUtils.copy(fis, os);
         fis.close();
-        os.close();
+        os.close(); 
       
    }
 
