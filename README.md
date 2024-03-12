@@ -32,5 +32,16 @@
 |현직자 신청하기 폼|![현직자신청하기폼](https://github.com/travler1/Hello-World/blob/master/%ED%98%84%EC%A7%81%EC%9E%90%20%EC%8B%A0%EC%B2%AD%ED%95%98%EA%B8%B0%20%ED%8F%BC.jpg)|
 |현직자프로필|![현직자프로필](https://github.com/travler1/Hello-World/blob/master/%ED%98%84%EC%A7%81%EC%9E%90%ED%94%84%EB%A1%9C%ED%95%84.jpg)|
 |첨삭기능|![첨삭기능](https://github.com/travler1/Hello-World/blob/master/%EC%B2%A8%EC%82%AD%EA%B8%B0%EB%8A%A5.png)|
+|채팅기능|![채팅기능](https://github.com/travler1/Hello-World/blob/master/%EC%B1%84%ED%8C%85%EA%B8%B0%EB%8A%A5.jpg)|
+|게시판 메인페이지|![게시판메인페이지](https://github.com/travler1/Hello-World/blob/master/%EA%B2%8C%EC%8B%9C%ED%8C%90%EB%A9%94%EC%9D%B8.jpg)|
+|게시판 글쓰기|![게시판글쓰기](https://github.com/travler1/Hello-World/blob/master/%EA%B2%8C%EC%8B%9C%ED%8C%90%EA%B8%80%EC%93%B0%EA%B8%B0.jpg)|
+|게시판 글상세|![게시판글상세](https://github.com/travler1/Hello-World/blob/master/%EA%B2%8C%EC%8B%9C%ED%8C%90%EA%B8%80%EC%83%81%EC%84%B8.jpg)|
+|DB설계|![DB설계](https://github.com/travler1/Hello-World/blob/master/DB%EC%84%A4%EA%B3%84.jpg)|
+|프로젝트 중 어려웠던 점|카카오지도 api 기능 혼합 사용<br>-	카카오지도에 현직자로 등록된 사용자들이 두 가지 방법으로 출력. (지도를 축소하면 지역별 숫자로 표시되는 마커 클러스터기능, 확대하면 사용자의 프로필사진이 출력되는 커스텀 오버레이기능)<br><br>카카오지도에 데이터 전달<br>-	각 사용자들의 프로필과 위도/경도 좌표를 전달하는 방법이 쉽지 않았음<br>파일 출력 기능<br><br>-	프로필 클릭메뉴 중 첨삭기능은 상대방에게 메시지와 첨삭받을 파일을 첨부해서 전달하는 기능<br>-	파일의 이름은 DB에 UUID를 추가하여 저장, 실제 파일은 프로젝트 내 upload폴더에 저장됨<br>-	버튼 클릭 시 upload폴더 내에 있는 파일을 가져오는 게 쉽지 않았음.|
+|해결방안||1.	카카오지도 api 혼합 사용<br>각각의 api 기능을 혼합해서 사용<br><br>2.	카카오지도에 데이터 전달<br>사용자들의 mem_num(멤버테이블에 저장된 사용자번호)와 위도/경도를 담은 리스트 형태로 만든 후 ObjectMapper 클래스의 writeValueAsString 메서드를 이용해 카카오지도에서 원하는 json 형식으로 만들어서 전달<br>![카카오지도JSON](https://github.com/travler1/Hello-World/blob/master/%EC%B9%B4%EC%B9%B4%EC%98%A4%EC%A7%80%EB%8F%84JSON.jpg)<br><br>3.	파일출력기능 <br>OutputStream과 FileInputStream 클래스를 이용하여 파일이름이 저장된 테이블의 고유번호(advice_num)로부터 파일이름을 불러온 후 파일입력객체를 생성하여 파일 전달 ![파일다운로드메서드](https://github.com/travler1/Hello-World/blob/master/%ED%8C%8C%EC%9D%BC%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C%EB%A9%94%EC%84%9C%EB%93%9C.jpg)|
+
+
+
+
 
 
